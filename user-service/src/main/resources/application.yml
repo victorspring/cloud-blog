@@ -1,0 +1,27 @@
+server:
+    port: 0
+spring:
+    application:
+        name: user-service
+    redis:
+        url: redis://:8wfef78EWFhcw223223lsshWEwhwr2@${REDIS_SERVER:localhost}:6379
+admin:
+    username: admin
+    password: wT2fsg3434gggwese234t23tgg
+keycloak:
+    token:
+        endpoint: /realms/master/protocol/openid-connect/token
+    url: http://${KEYCLOAK_SERVER:localhost}:8080
+    users: /admin/realms/maxima/users
+
+eureka:
+    instance:
+        leaseRenewalIntervalInSeconds: 1
+        leaseExpirationDurationInSeconds: 2
+    client:
+        serviceUrl:
+            defaultZone: http://${EUREKA_SERVER:localhost}:9999/eureka/
+        healthcheck:
+            enabled: true
+        lease:
+            duration: 5

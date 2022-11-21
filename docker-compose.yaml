@@ -1,0 +1,78 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'FEw89GEge29f323iefsfsd2'
+      POSTGRES_DB: 'postgres'
+    ports:
+      - '5432:5432'
+    volumes:
+      - ~/apps/postgresql:/var/lib/postgresql/data
+  redis:
+    image: redis:7.0.1-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass 8wfef78EWFhcw223223lsshWEwhwr2 --maxmemory 10mb
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    restart: always
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: wT2fsg3434gggwese234t23tgg
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/conf/server.crt.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/server.key.pem
+    volumes:
+      - ~/server.crt.pem:/opt/keycloak/conf/server.crt.pem
+      - ~/server.key.pem:/opt/keycloak/conf/server.key.pem
+    ports:
+      - '8443:8443'
+    command:
+      - start-dev
+  discovery:
+    build: ./service-discovery
+    image: victorspring/maxima-service-discovery
+    restart: always
+    ports:
+      - '9999:9999'
+  gateway:
+    build: ./api-gateway
+    image: vicrspring/maxima-api-gateway
+    restart: always
+    environment:
+      EUREKA_SERVER: discovery
+    depends_on:
+      - discovery
+    ports:
+      - '9000:9000'
+  blog-service:
+    build: ./blog-service
+    image: victorspring/maxima-blog-service
+    restart: always
+    environment:
+      EUREKA_SERVER: discovery
+      KEYCLOAK_SERVER: keycloak
+      POSTGRES_SERVER: postgres
+      REDIS_SERVER: redis
+    depends_on:
+      - discovery
+      - keycloak
+      - postgres
+      - redis
+  user-service:
+    build: ./user-service
+    image: victorspring/maxima-user-service
+    restart: always
+    environment:
+      EUREKA_SERVER: discovery
+      KEYCLOAK_SERVER: keycloak
+      REDIS_SERVER: redis
+    depends_on:
+      - discovery
+      - keycloak
+      - redis
+

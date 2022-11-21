@@ -1,0 +1,40 @@
+server:
+  port: 0
+  error:
+    include-stacktrace: never
+spring:
+  application:
+    name: blog-service
+  redis:
+    url: redis://:8wfef78EWFhcw223223lsshWEwhwr2@${REDIS_SERVER:localhost}:6379
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_SERVER:localhost}:5432/postgres
+    username: postgres
+    password: FEw89GEge29f323iefsfsd2
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://${KEYCLOAK_SERVER:localhost}:8080/realms/maxima/protocol/openid-connect/certs
+
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
+    instanceId: ${spring.application.name}:${random.int}
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKA_SERVER:localhost}:9999/eureka/
+    healthcheck:
+      enabled: true
+    lease:
+      duration: 5
+
+user-service:
+  endpoint: http://api-gateway/user
